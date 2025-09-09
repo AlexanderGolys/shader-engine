@@ -1,0 +1,28 @@
+#version 430 core
+
+
+layout (std430, binding = 3) buffer Data {
+    int values[];
+};
+
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+
+bool random_bool(int seed) {
+    int key = 2137;
+    return sin(-float(seed*696969) + float(key)*420) > 0.0;
+}
+
+int randomize_int(int seed, int x)
+{
+    int result = x;
+    for (int i = 0; i < 32; i++)
+        if (random_bool(seed+i))
+            result ^= (1 << i);
+    return result;
+}
+
+void main() {
+    uint index = gl_GlobalInvocationID.x;
+    values[index] = randomize_int(int(index), values[index]);
+}

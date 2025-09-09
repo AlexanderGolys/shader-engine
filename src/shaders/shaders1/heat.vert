@@ -1,0 +1,36 @@
+#version 330 core
+
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec3 normal;
+layout (location = 2) in vec2 uv;
+layout (location = 3) in vec4 color;
+
+
+
+out vec4 v_color;
+out vec3 v_position;
+out vec3 v_normal;
+out vec2 v_uv;
+
+uniform mat4 mvp;
+uniform mat4 light1;
+uniform mat4 light2;
+uniform mat4 light3;
+uniform vec3 camPosition;
+
+
+vec3 normalise(vec3 v)
+{
+	return v / length(v);
+}
+
+void main()
+{
+	v_normal = normal;
+//    v_normal = (mvp * vec4(normal, 0.0)).xyz;
+    vec4 p = vec4(position.xy, position.z*(1+0*color.x)/1, 1.0);
+	gl_Position = mvp * p;
+	v_position = p.xyz;
+	v_color = color;
+	v_uv = uv;
+}

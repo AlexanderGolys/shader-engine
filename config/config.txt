@@ -1,0 +1,8 @@
+root:               C:\\Users\\PC\\Desktop\\ogl-master
+templateShaders:    src\\shaders\\shader-templates
+sdfTools:           src\\shaders\\glsl-macro-modules\\sdfTools.glsl
+mathTools:          src\\shaders\\glsl-macro-modules\\mathTools.glsl
+lightTools:         src\\shaders\\glsl-macro-modules\\lightToolsSS.glsl
+glslStructs:        src\\shaders\\glsl-macro-modules\\structs.glsl
+shadersDir:         src\\shaders\\shaders2
+screenshotsDir:     out\\screenshots
