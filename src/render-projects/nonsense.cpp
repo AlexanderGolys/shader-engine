@@ -2,9 +2,13 @@
 
 #include "../utils/logging.hpp"
 
+#include "nonsensify/nonsensifyAPI.hpp"
+
+NonsensifyConfig cfg = NonsensifyConfig(false, true, EncriptionType::GLOBAL);
+
 int main() {
 	openglAPI::openGL_API_init();
-	FileDescriptor file = FileDescriptor("C:\\Users\\PC\\Downloads\\nazi.jpg");
+	FileDescriptor file = FileDescriptor("C:\\Users\\PC\\Downloads\\EaxUWVlIFcPdMtQn.nonsense");
 	LOG(format("File {} (size: {} kB, path {})", file.getFilename(), file.getSize()/1024, file.getPath()));
 
 	auto shader = make_shared<openglAPI::Shader>(CodeFileDescriptor("C:\\Users\\PC\\Desktop\\ogl-master\\src\\shaders\\compute\\base.comp", false));
@@ -13,9 +17,11 @@ int main() {
 	auto program = make_shared<openglAPI::ComputeShaderProgram>(shader);
 	LOG("Shader compiled");
 
-	auto hasher = Hasher(1024*1024, program);
-	LOG("Hasher initialised");
+	auto nonsensify = NonsensifyAPI(program);
+	LOG("Nonsensify API initialised");
 
-	hasher.hashFile(file);
+	// nonsensify.nonensifyFile(file, cfg);
+
+	nonsensify.denonsensifyFile(file);
 
 }

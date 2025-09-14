@@ -73,25 +73,30 @@ inline float randomFloat(float a=0, float b=1) {
 inline std::string randomStringNumeric() {
 	return std::to_string(randomLong());
 }
-
-inline char randomLetter() {
-    return (char)randomInt()%('Z' - 'a') + 'a';
+inline bool randomBool() {
+	return randomInt()%2 == 0;
 }
+
 inline char randomLetterSmall() {
-    return (char)randomInt()%('z' - 'a') + 'a';
+    return (char)(randomInt() % 26 + 'a');
 }
 inline char randomLetterBig() {
-    return (char)randomInt()%('Z' - 'A') + 'A';
+    return (char)(randomInt() % 26 + 'A') ;
 }
 inline char randomNumericChar() {
     return (char)randomInt()%('9' - '0') + '0';
 }
+inline char randomLetter() {
+	if (randomBool())
+		return randomLetterBig();
+	return randomLetterSmall();
+}
 
 
 inline std::string randomStringLetters(int size=10) {
-	std::string res;
+	std::string res = "";
     for (int i = 0; i < size; i++)
-        res += (char)randomInt()%('z' - 'a') + 'a';
+        res += randomLetter();
     return res;
 }
 

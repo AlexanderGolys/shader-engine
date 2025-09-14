@@ -1119,7 +1119,7 @@ T normalise(T v) {
 
 template<typename T, typename U=T>
 bool nearlyEqual(T a, U b) {
-	return norm(a - b) < 1e-6;
+	return norm(a - b) < 1e-4;
 }
 
 template<typename M>

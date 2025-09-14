@@ -11,8 +11,8 @@ void Hasher::hashFile(FileDescriptor &file) {
 	size_t size_left = old_size;
 	size_t padding_bytes = groups_nb * sizeof(GLint) / sizeof(char);
 
-	if (size_left %padding_bytes != 0){
-		size_left += padding_bytes - size_left %padding_bytes;
+	if (size_left % padding_bytes != 0){
+		size_left += padding_bytes - size_left % padding_bytes;
 		file.resize(size_left);
 		LOG(format("File size increased from {} to {} bytes to be multiple of {}", old_size, size_left, padding_bytes));
 	}

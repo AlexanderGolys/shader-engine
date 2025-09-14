@@ -122,7 +122,7 @@ inline void printTestResult(const string& test_name, const UnitTestResult& resul
 	if (result.all == 0)
 		return;
 	if (result.passed == result.all)
-		LOG("Test " + test_name + " passed [" + std::to_string(result.passed) + "/" + std::to_string(result.all) + "]");
+		LOG_TEST_OK("Test " + test_name + " passed [" + std::to_string(result.passed) + "/" + std::to_string(result.all) + "]");
 	else
-		LOG_WARN("Test " + test_name + " failed [" + std::to_string(result.passed) + "/" + std::to_string(result.all) + "]");
+		LOG_TEST_FAIL("Test " + test_name + " failed [" + std::to_string(result.passed) + "/" + std::to_string(result.all) + "]");
 }

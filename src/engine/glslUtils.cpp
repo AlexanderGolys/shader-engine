@@ -151,7 +151,7 @@ GLenum Shader::getTypeFromExtension(const string &extension) {
 		return GL_FRAGMENT_SHADER;
 	if (nodot == "geom" || nodot == "geo")
 		return GL_GEOMETRY_SHADER;
-	throw SystemError("Unknown shader extension: ." + nodot, __FILE__, __LINE__);
+	throw SystemError("Unknown shader getExtension: ." + nodot, __FILE__, __LINE__);
 }
 
 

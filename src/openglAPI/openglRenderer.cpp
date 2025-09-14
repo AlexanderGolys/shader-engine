@@ -167,7 +167,7 @@ namespace openglAPI {
 			return GL_GEOMETRY_SHADER;
 		if (nodot == "comp")
 			return GL_COMPUTE_SHADER;
-		throw SystemError("Unknown shader extension: ." + nodot, __FILE__, __LINE__);
+		throw SystemError("Unknown shader getExtension: ." + nodot, __FILE__, __LINE__);
 	}
 
 

@@ -316,7 +316,7 @@ VectorField VectorField::curl() const {
 
 class Flow Flow::spatial_partial(int i) const {
 	return Flow([F=F, e=eps](vec3 x, float t) {
-		return derivativeOperator(hom_adjunction(F)(x), e)(t);
+		return derivativeOperator(curry(F)(x), e)(t);
 	}, eps);
 }
 
@@ -356,7 +356,7 @@ ScalarField Flow::F_z() const { return ScalarField([F=F](vec3 x, float t) { retu
 
 Flow Flow::time_derivative() const {
 	return Flow([F=F, e=eps](vec3 x, float t) {
-		return derivativeOperator(hom_adjunction(F)(x), e)(t);
+		return derivativeOperator(curry(F)(x), e)(t);
 	}, eps);
 }
 

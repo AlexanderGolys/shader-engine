@@ -303,9 +303,9 @@ public:
 
 
 	// 	Flow spatial_partial_derivative(int i) const {
-// 		return Flow([F_=F, i, e=eps](vec3 x, float t){
-// 			return partialDerivativeOperator([F=F_, i=i, t](vec3 y) {
-// 				return F(y, t);
+// 		return Flow([F_=F, i, e=eps](vec3 x, float v){
+// 			return partialDerivativeOperator([F=F_, i=i, v](vec3 y) {
+// 				return F(y, v);
 // 			}, i, e);
 // }
 // 	}

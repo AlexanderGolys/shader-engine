@@ -11,6 +11,7 @@
 
 #include "exceptions.hpp"
 #include "concepts.hpp"
+#include "monads.hpp"
 
 
 
@@ -612,48 +613,12 @@ string str(T x) {
 }
 
 
-template<typename Y>
-HOM(vec2, Y) wrap(const BIHOM(float, float, Y) &f_) {
-	return [f=f_](vec2 v) {
-		return f(v.x, v.y); };
-}
-
-template<typename Y>
-BIHOM(float, float, Y) unwrap(const HOM(vec2, Y) &f_) { return [f=f_](float x, float y) {
-	return f(vec2(x, y)); };
-}
-
-template<typename Y>
-HOM(vec3, Y) wrap(const TRIHOM(float, float, float, Y) &f_) { return [f=f_](vec3 v) {
-	return f(v.x, v.y, v.z); }; }
-
-template<typename Y>
-TRIHOM(float, float, float, Y) unwrap(const HOM(vec3, Y) &f_) { return [f=f_](float x, float y, float z) {
-	return f(vec3(x, y, z)); }; }
-
-template<typename C1, typename C2=C1, typename D>
-BIHOM(C1, C2, D) uncurry(HOM(C1, HOM(C2, D)) f) {
-	return [f=f](C1 x, C2 y) {
-		return f(x)(y); }; }
-
-template<typename C1, typename C2=C1, typename D>
-BIHOM(C1, C2, D) uncurry_perm(const HOM(C2, HOM(C1, D)) &f) {
-	return [F=f](C1 x, C2 y) {
-		return F(y)(x); }; }
-
-template<typename C1, typename C2=C1, typename D>
-HOM(C1, HOM(C2, D)) uncurry(const BIHOM(C1, C2, D) &f) {
-	return [F=f](C1 x) { return [F, x](C2 y) { return F(x, y); }; }; }
-
-template<typename C1, typename C2=C1, typename D>
-HOM(C2, HOM(C1, D)) uncurry_perm(const BIHOM(C1, C2, D) &f) {
-	return [F=f](C2 y) { return [F, y](C1 x) { return F(x, y); }; }; }
 
 template<typename V>
 V lerp(V a, V b, float t) { return b * t + a * (1.f - t); }
 
 // template<typename V>
-// V clamp(V a, V b, float t) { return min(b, max(a, t)); }
+// V clamp(V a, V b, float v) { return min(b, max(a, v)); }
 template<typename V>
 V lerpClamp(V a, V b, float t, V max_v = V(1), V min_v = V(0)) { return lerp(a, b, clamp(min_v, max_v, t)); }
 
@@ -699,7 +664,7 @@ vector<A> arange(A a, A b, A step) {
 	vector<A> res;
 	for (A i = a; i < b; i += step) {
 		res.push_back(i);
-		if (res.size() > 1000000) throw std::format_error("arange didn't terminate in milion iterations");
+		if (res.size() > 1000000) throw std::format_error("arange didn'v terminate in milion iterations");
 	}
 	return res;
 }

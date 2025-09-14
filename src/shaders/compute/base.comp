@@ -26,3 +26,13 @@ void main() {
     uint index = gl_GlobalInvocationID.x;
     values[index] = randomize_int(int(index), values[index]);
 }
+
+struct Data {
+    vec3 a;
+    vec2 b;
+};
+
+struct Nested {
+    Data d;
+    float c;
+};

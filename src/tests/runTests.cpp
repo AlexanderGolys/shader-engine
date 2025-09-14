@@ -3,6 +3,7 @@
 #include "formattersTests.hpp"
 #include "experimentalTests.hpp"
 #include "filesystemTests.hpp"
+#include "quatGLSLModuleTests.hpp"
 #include "../utils/logging.hpp"
 
 int main()
@@ -29,6 +30,10 @@ int main()
 	test_result = filesystemTests__all();
 	total_result += test_result;
 	printTestResult("Filesystem Tests", test_result);
+
+	test_result = quatGLSLModuleTests__all();
+	total_result += test_result;
+	printTestResult("Quaternion GLSL Module Tests", test_result);
 
 	LOG("--------------------------------");
 	printTestResult("All Tests", total_result);

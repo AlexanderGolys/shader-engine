@@ -14,6 +14,8 @@ FileDescriptor::~FileDescriptor() {
 
 
 void FileDescriptor::mapFile() {
+    if (address != nullptr)
+        return;
     string fullPath = path.to_str();
     fileHandle = CreateFileA(fullPath.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (fileHandle == INVALID_HANDLE_VALUE)
@@ -34,6 +36,8 @@ void FileDescriptor::flush() const {
 }
 
 void FileDescriptor::closeFile() {
+    if (address == nullptr)
+        return;
     if (address)
         UnmapViewOfFile(address);
     address = nullptr;

@@ -1,6 +1,7 @@
 #pragma once
 #include "../openglAPI/computeShaders.hpp"
 #include "../utils/file-management/filesUtils.hpp"
+#include "fileExtension.hpp"
 
 
 
@@ -13,4 +14,5 @@ class Hasher {
 	public:
 		Hasher(size_t max_buffer_size, shared_ptr<openglAPI::ComputeShaderProgram> computeShaderProgram);
 		void hashFile(FileDescriptor &file);
+
 };

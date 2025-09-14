@@ -6,14 +6,17 @@
 #define NONSENSIFY_VERSION_MINOR 1
 #define NONSENSIFY_VERSION ((NONSENSIFY_VERSION_MAJOR << 8) | NONSENSIFY_VERSION_MINOR)
 
-enum class EncriptionType : char {
+enum EncriptionType {
 	GLOBAL = 0,
 	LOCAL = 1,
 	PRIVATE = 2
 };
 
+
 char encriptionChar(EncriptionType type, bool filenameNonsensify);
+
 EncriptionType encriptionTypeFromChar(char c);
+
 bool isFilenameNonsensified(char c);
 
 
@@ -29,8 +32,7 @@ struct CustomFileHeader
 	char encriptionType;
 
 	CustomFileHeader(uint64_t dataSize, const string &filename, const string &originalExtension, EncriptionType encriptionType, bool filenameNonsensify);
+	CustomFileHeader();
 	~CustomFileHeader() = default;
-
-	void serialize(char* buffer) const;
-	void deserialize(const char* buffer);
+	bool verify() const;
 };

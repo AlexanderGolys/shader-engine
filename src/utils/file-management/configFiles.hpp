@@ -11,7 +11,7 @@ class JSONParser : public CodeFileDescriptor {
 	string getStringValue(const string &key) const {
 		string code = readCode();
 		code = removeWhitespace(code);
-		size_t keyPos = code.find(format("\"{}\":\"", key));
+		size_t keyPos = code.find("\"" + key + "\":\"");
 		if (keyPos == string::npos)
 			throw ValueError("Key " + key + " not found in JSON file", __FILE__, __LINE__);
 		size_t colonPos = code.find(':', keyPos);

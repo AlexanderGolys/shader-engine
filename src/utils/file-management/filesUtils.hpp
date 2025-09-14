@@ -1,6 +1,8 @@
 #pragma once
 
-#include "../exceptions.hpp"
+#include "metaUtils.hpp"
+
+#include "exceptions.hpp"
 
 
 
@@ -26,15 +28,10 @@ public:
 	Path operator+(const string &other) const;
 	Path operator+(const Path &other) const;
 
-
 	bool endsWithFile(const string &filename) const;
 	bool endsWithFile() const;
-	bool isAbsolute() const {
-		return path.is_absolute();
-	}
-	bool isPrimitive() const {
-		return is_empty(path.parent_path());
-	}
+	bool isAbsolute() const;
+	bool isPrimitive() const;
 
 	Path pureDirectory() const;
 	string filename() const;
@@ -45,6 +42,8 @@ public:
 	Path makeAbsolute() const;
 	Path goUp() const;
 	string to_str() const;
+
+	bool operator==(const Path &other) const { return path == other.path; }
 };
 
 class FilePath {
@@ -54,6 +53,7 @@ public:
 	FilePath(const Path &path);
 	FilePath(const Path &directory, const string &filename);
 	FilePath(const string &directory, const string &filename);
+	FilePath(const filesystem::path &path);
 	Path getPath() const;
 	string getFilename() const;
 	string getExtension() const;
@@ -65,7 +65,7 @@ public:
 	void resize(size_t newSize) const;
 	size_t size() const;
 	string to_str() const;
-
+	bool isPrimitive() const;
 };
 
 
@@ -87,7 +87,7 @@ public:
 	bool exists() const;
 	void writeCode(const string &code) const;
 	void modifyCode(const string &code) const;
-	void saveNewCode(const string &code) const;
+	void saveCopyToNewFile(const string &code) const;
 	bool recogniseDirectoryNamingStyle();
 	void changeDirectoryNamingStyle(bool unix = true);
 	void changeLine(const string &line, int lineNumber);
@@ -115,7 +115,37 @@ public:
 	void* getAddress();
 	void flush() const;
 	string getPath() const;
-	string extension() const;
+
+	string getExtension() const;
 	string getFilename() const;
 	void resize(size_t newSize);
+	void addPaddingAtStart(size_t padding);
+	void writeData(const void* data, size_t size, size_t offset);
+	void rename(const string &newName);
+	void removeDataFromStart(size_t deletedChunkSize);
+	void readData(void* destination, size_t size, size_t offset);
+};
+
+
+bool isValidFilename(const string &filename);
+bool isValidFilenameCharacter(char c);
+
+
+
+class DirectoryDescriptor {
+	Path path;
+
+public:
+	DirectoryDescriptor(const Path &p);
+	DirectoryDescriptor(const string &p);
+	DirectoryDescriptor(const filesystem::path &p);
+	Path getPath() const;
+	bool exists() const;
+
+	vector<FilePath> listFiles() const;
+	vector<DirectoryDescriptor> listDirectories() const;
+	vector<FilePath> listAllFilesRecursively() const;
+	size_t directorySize() const;
+
+	bool operator==(const DirectoryDescriptor &other) const { return path == other.path; }
 };

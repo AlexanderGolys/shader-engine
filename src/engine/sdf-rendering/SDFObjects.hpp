@@ -105,8 +105,6 @@ public:
 };
 
 
-
-
 SDFObject sphereSDF(float radius, const string &name = "sdf");
 SDFObject boxSDF(vec3 size, string name = "sdf");
 SDFObject planeSDF(const string &name = "sdf");

@@ -42,10 +42,10 @@ constexpr float TAU = 6.28318530718f;
 #define GEN_VEC(R) GenericTensor<R, R>
 #define GEN_MAT(R) GenericTensor<R, GEN_VEC(R)>
 
-namespace std {
+// namespace std {
 
 #define MAYBE(A) std::optional<A>
-#define HOM(B,A) std::function<A(B)>
+#define HOM(B, A) std::function<A(B)>
 #define BIHOM(A, B, C) std::function<C(A,B)>
 #define TRIHOM(A, B, C, D) std::function<D(A,B,C)>
 #define QUADHOM(A, B, C, D, E) std::function<E(A,B,C,D)>
@@ -123,9 +123,9 @@ namespace std {
 #define unpackQuad(F, vec, ...) [F](vec v, ...){return F(v[0], v[1], v[2], v[3], ...);}
 // #define curry(F, arg, ...) [F](arg a, ...){return F(a, ...);}
 // #define uncarry(F, arg, arg2, ...) [F](HOM(arg, HOM(arg2, ...)) _f, arg a, ...){return _f(a)(...);}
-}
+// }
 
-// #define Foo(A)_Foo33 Foo33([](float){return hom(A, glm::mat3)(t);};)
+// #define Foo(A)_Foo33 Foo33([](float){return hom(A, glm::mat3)(v);};)
 #define vec420 std::vector<float>
 #define vec69 std::vector<float>
 #define vec2137 std::vector<float>
@@ -138,7 +138,8 @@ std::function<A(std::function<B(C)>)> curr(std::function<A(B, C)> f) {
 	return [f](std::function<B(C)> g) { return [f, g](C c) { return f(g(c), c); }; };
 }
 
-
+template <typename A, typename B>
+using dict = std::map<A, B>;
 
 
 #define BigMatrix_t HOM(float, FloatMatrix)
@@ -152,3 +153,5 @@ std::function<A(std::function<B(C)>)> curr(std::function<A(B, C)> f) {
 
 
 // }
+
+#define THROW(ErrType, ...) throw ErrType(__VA_ARGS__, __FILE__, __LINE__)

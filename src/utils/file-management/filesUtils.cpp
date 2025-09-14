@@ -44,7 +44,7 @@ Path CodeFileDescriptor::getDirectory() const {
 Path::Path() {
 	path = filesystem::current_path();
 	if (path==filesystem::path())
-		throw FileSystemError("Current directory not found", __FILE__, __LINE__);
+		THROW(FileSystemError, "Current directory not found");
 	makePrefferedStyle();
 }
 
@@ -91,15 +91,23 @@ Path Path::operator+(const Path &other) const {
 
 
 bool Path::endsWithFile(const string &filename) const {
-	return path.has_filename() && path.filename().string() == filename;
+	return path.has_extension() && path.filename().string() == filename;
 }
 
 bool Path::endsWithFile() const {
-	return path.has_filename();
+	return path.has_extension();
+}
+
+bool Path::isAbsolute() const {
+	return path.is_absolute();
 }
 
 
 
+
+bool Path::isPrimitive() const {
+	return is_empty(path.parent_path());
+}
 
 Path Path::pureDirectory() const {
 	if (path.has_filename())
@@ -120,7 +128,7 @@ string Path::filename() const {
 
 
 string Path::fileExtension() const {
-	if (path.has_filename())
+	if (path.has_extension())
 		return path.extension().string();
 	throw ValueError("Path does not end with a file", __FILE__, __LINE__);
 }
@@ -159,6 +167,8 @@ FilePath::FilePath(const Path &directory, const string &filename): FilePath(dire
 
 FilePath::FilePath(const string &directory, const string &filename): FilePath(Path(directory) + filename) {}
 
+FilePath::FilePath(const filesystem::path &path): FilePath(path.string()) {}
+
 Path FilePath::getPath() const { return path; }
 
 string FilePath::getFilename() const { return path.filename(); }
@@ -195,12 +205,14 @@ string FilePath::to_str() const {
 	return path.to_str();
 }
 
+bool FilePath::isPrimitive() const { return path.isPrimitive(); }
+
 // Path::operator string() const { return path; }
 string FileDescriptor::getPath() const {
 	return path.to_str();
 }
 
-string FileDescriptor::extension() const {
+string FileDescriptor::getExtension() const {
 	return path.getExtension();
 }
 
@@ -209,11 +221,159 @@ string FileDescriptor::getFilename() const {
 }
 
 void FileDescriptor::resize(size_t newSize) {
+	bool wasMapped = address != nullptr;
+	if (wasMapped)
+		closeFile();
 	path.resize(newSize);
 	bytesize = newSize;
-	if (address)
+	if (wasMapped)
 		mapFile();
 }
+
+void FileDescriptor::addPaddingAtStart(size_t padding) {
+	bool wasMapped = address != nullptr;
+	size_t old_size = getSize();
+	size_t new_size = old_size + padding;
+	resize(new_size);
+	if (!wasMapped)
+		mapFile();
+	memmove((char*)address + padding, address, old_size);
+	memset(address, 0, padding);
+	flush();
+	if (!wasMapped)
+		closeFile();
+}
+
+void FileDescriptor::writeData(const void *data, size_t size, size_t offset) {
+	bool wasMapped = address != nullptr;
+	if (!wasMapped)
+		mapFile();
+	if (offset + size > bytesize)
+		throw ValueError("Writing data out of bounds: " + std::to_string(offset + size) + " > " + std::to_string(bytesize), __FILE__, __LINE__);
+	memcpy((char*)address + offset, data, size);
+	flush();
+	if (!wasMapped)
+		closeFile();
+}
+
+void FileDescriptor::rename(const string &newName) {
+	bool wasMapped = address != nullptr;
+	if (wasMapped)
+		closeFile();
+	path.rename(newName);
+	if (wasMapped)
+		mapFile();
+}
+
+void FileDescriptor::removeDataFromStart(size_t deletedChunkSize) {
+	bool wasMapped = address != nullptr;
+	size_t old_size = getSize();
+	size_t new_size = old_size - deletedChunkSize;
+	if (!wasMapped)
+		mapFile();
+	memmove(address, (char*)address + deletedChunkSize, new_size);
+	flush();
+	if (!wasMapped)
+		closeFile();
+	resize(new_size);
+}
+
+void FileDescriptor::readData(void *destination, size_t size, size_t offset) {
+	bool wasMapped = address != nullptr;
+	if (!wasMapped)
+		mapFile();
+	if (offset + size > bytesize)
+		throw ValueError("Reading data out of bounds: " + std::to_string(offset + size) + " > " + std::to_string(bytesize), __FILE__, __LINE__);
+	memcpy(destination, (char*)address + offset, size);
+	if (!wasMapped)
+		closeFile();
+}
+
+bool isValidFilenameCharacter(char c) {
+	const string valid_nonalphanumeric = "._- ";
+	if (isalnum(c)) return true;
+	for (char valid : valid_nonalphanumeric)
+		if (c == valid) return true;
+	return false;
+}
+
+DirectoryDescriptor::DirectoryDescriptor(const Path &p): path(p) {
+	if (path.endsWithFile())
+		THROW(FileSystemError, "Path " + path.to_str() + " points to a file, not a directory");
+}
+
+DirectoryDescriptor::DirectoryDescriptor(const string &p): DirectoryDescriptor(Path(p)) {}
+
+DirectoryDescriptor::DirectoryDescriptor(const filesystem::path &p): DirectoryDescriptor(Path(p)) {}
+
+
+
+Path DirectoryDescriptor::getPath() const { return path;}
+
+bool DirectoryDescriptor::exists() const {
+	return filesystem::exists(path.path) && filesystem::is_directory(path.path);
+}
+
+vector<FilePath> DirectoryDescriptor::listFiles() const {
+	vector<FilePath> files;
+	if (!exists())
+		throw FileSystemError("Directory " + path.to_str() + " not found at this device.", __FILE__, __LINE__);
+
+	for (const auto & entry : filesystem::directory_iterator(path.path))
+		if (filesystem::is_regular_file(entry.status()) && !filesystem::is_empty(entry.path()))
+			files.emplace_back(entry.path());
+	return files;
+
+}
+
+vector<DirectoryDescriptor> DirectoryDescriptor::listDirectories() const {
+	vector<DirectoryDescriptor> dirs;
+	if (path.isPrimitive())
+		return dirs;
+	if (!exists())
+		THROW(FileSystemError, "Directory " + path.to_str() + " not found at this device.");
+	for (const auto & entry : filesystem::directory_iterator(path.path))
+		if (filesystem::is_directory(entry.status()) && !filesystem::is_empty(entry.path()))
+			dirs.emplace_back(DirectoryDescriptor(Path(entry.path())));
+	return dirs;
+
+}
+
+vector<FilePath> DirectoryDescriptor::listAllFilesRecursively() const {
+	vector<FilePath> files = listFiles();
+	vector<DirectoryDescriptor> dirs = listDirectories();
+	for (const DirectoryDescriptor &dir : dirs)
+		addAll(files, dir.listAllFilesRecursively());
+	return files;
+}
+
+size_t DirectoryDescriptor::directorySize() const {
+	vector<FilePath> files = listAllFilesRecursively();
+	return sum<size_t, vector<size_t>>(map<FilePath, size_t>(files, [](const FilePath &f) { return f.size(); }));
+}
+
+
+bool isValidFilename(const string &filename) {
+	if (filename.empty()) return false;
+	if (filename.size() > 255) return false;
+
+	bool contains_dot = false;
+	bool contains_sth_after_dot = false;
+
+	for (char c : filename) {
+		if (!isValidFilenameCharacter(c))
+			return false;
+
+		if (contains_dot)
+			contains_sth_after_dot = true;
+
+		if (c == '.')
+			contains_dot = true;
+	}
+
+	return contains_sth_after_dot;
+}
+
 
 
 
@@ -294,7 +454,6 @@ bool CodeFileDescriptor::exists() const {
 }
 
 void CodeFileDescriptor::writeCode(const string &code) const {
-	if (exists()) std::cout << "Overwriting code in file " << getFilename() << std::endl;
 	std::ofstream shaderStream(getPath().to_str(), std::ios::out);
 	if (shaderStream.is_open()) {
 		shaderStream << code;
@@ -310,7 +469,7 @@ void CodeFileDescriptor::modifyCode(const string &code) const {
 	writeCode(code);
 }
 
-void CodeFileDescriptor::saveNewCode(const string &code) const {
+void CodeFileDescriptor::saveCopyToNewFile(const string &code) const {
 	if (exists())
 		throw SystemError("File " + getFilename() + " already exists in " + getDirectory().to_str() + ".", __FILE__, __LINE__);
 	writeCode(code);
@@ -323,7 +482,7 @@ bool CodeFileDescriptor::recogniseDirectoryNamingStyle() {
 
 
 size_t FileDescriptor::getSize() {
-	return path.size();
+	return bytesize;
 }
 
 void* FileDescriptor::getAddress() {

@@ -2872,13 +2872,13 @@ ScalarField ScalarField::operator/(const ScalarField &f) const { return ScalarFi
 
 ScalarField ScalarField::time_derivative() const {
 	return ScalarField([F=F, e=eps](vec3 x, float t) {
-		return derivativeOperator(hom_adjunction(F)(x), e)(t);
+		return derivativeOperator(curry(F)(x), e)(t);
 	}, eps);
 }
 
 ScalarField ScalarField::spatial_partial(int i) const {
 	return ScalarField([F=F, e=eps](vec3 x, float t) {
-		return derivativeOperator(hom_adjunction(F)(x), e)(t);
+		return derivativeOperator(curry(F)(x), e)(t);
 	}, eps);
 }
 
