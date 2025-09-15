@@ -71,6 +71,8 @@ bool GLSLValidType::operator==(const GLSLPrimitiveType::BuiltInType &other) cons
 }
 
 
+GLSLStruct::GLSLStruct(const string &name, const dict<string, GLSLValidType> &members): name(name), members(members) {}
+
 string GLSLStruct::declarationCode() const {
 	string s = "struct " + name + " {\n";
 	for (const auto& [memberName, memberType] : members)
@@ -119,24 +121,20 @@ SDFPrimitiveCentered::SDFPrimitiveCentered(const GLSLStruct &sdfParametersStatic
 		THROW(ValueError, "Second argument of SDF function must be the position vector (vec3) named x");
 }
 
+SDFStateStruct::SDFStateStruct(const GLSLStruct &base):
+GLSLStruct("State_" + base.name,
+			dict<string, GLSLValidType>{
+				{"transform", GLSLValidType(GLSLParameterType(GLSLPrimitiveType::SE3_STRUCT))},
+				{"params", GLSLValidType(make_shared<GLSLStruct>(base))}
+			}) {}
 
-SDFPrimitive::SDFPrimitive(const SDFPrimitiveCentered &sdfParametersStatic)
-: sdfFunction(sdfParametersStatic.sdfFunction)
+
+SDFPrimitive::SDFPrimitive(const SDFPrimitiveCentered &SDFDefaultPositioned)
+: sdfState(SDFDefaultPositioned.sdfParametersStatic), sdfFunction(SDFDefaultPositioned.sdfFunction)
 {
-	sdfParameterState = GLSLStruct{
-		"State_" + sdfParametersStatic.sdfParametersStatic.name,
-		dict<string, GLSLValidType>{
-			{"transform", GLSLValidType(GLSLParameterType(GLSLPrimitiveType::SE3_STRUCT))},
-			{"params", GLSLValidType(make_shared<GLSLStruct>(sdfParametersStatic.sdfParametersStatic))}
-		}
-	};
 	sdfFunction.arguments[0].second += "__";
 	sdfFunction.arguments[1].second += "__";
-	auto param_struct_name = sdfParametersStatic.sdfParametersStatic.name;
+	auto param_struct_name = SDFDefaultPositioned.sdfParametersStatic.name;
 
-	sdfFunction.body =
-		"SE3 g = param__.transform;\n " +
-		param_struct_name + " param = param__.params;\n" +
-		"vec3 x = act_SE3(inv_SE3(g), x__);\n" +
-	sdfFunction.body;
+	sdfFunction.body = "SE3 g = param__.transform;\n " + param_struct_name + " param = param__.params;\n" + "vec3 x = act_SE3(inv_SE3(g), x__);\n" + sdfFunction.body;
 }

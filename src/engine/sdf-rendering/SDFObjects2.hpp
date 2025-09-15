@@ -69,11 +69,20 @@ struct GLSLStruct
 {
     string name;
     dict<string, GLSLValidType> members;
+	GLSLStruct(const string &name, const dict<string, GLSLValidType> &members);
 
     string declarationCode() const;
     string typeName() const;
 	bool operator==(const GLSLStruct &other) const;
 };
+
+
+class SDFStateStruct : public GLSLStruct {
+public:
+	SDFStateStruct(const GLSLStruct &base);
+};
+
+
 
 class GLSLFunction {
 public:
@@ -94,9 +103,9 @@ public:
 struct SDFPrimitiveCentered {
 	GLSLStruct sdfParametersStatic;
 	GLSLFunction sdfFunction;
-
 	SDFPrimitiveCentered(const GLSLStruct &sdfParametersStatic, const GLSLFunction &sdfFunction);
 };
+
 
 
 /*
@@ -108,15 +117,14 @@ struct SDFPrimitiveCentered {
  * The action of SE3 on R3 is implemented in quat.glsl module that need to be included in the shader code for this to work.
  */
 struct SDFPrimitive {
-	GLSLStruct sdfParameterState;
+	SDFStateStruct sdfState;
 	GLSLFunction sdfFunction;
-
-	SDFPrimitive(const SDFPrimitiveCentered &sdfParametersStatic);
+	SDFPrimitive(const SDFPrimitiveCentered &SDFDefaultPositioned);
 };
 
 
 
 class SDFObj {
 	GLSLFunction sdf;
-	GLSLStruct sdfParameters;
+	SDFStateStruct state;
 };
