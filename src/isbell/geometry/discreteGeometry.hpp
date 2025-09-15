@@ -1,6 +1,6 @@
 #pragma once
 
-#include "src/engine/indexedRendering.hpp"
+#include "engine/indexedRendering.hpp"
 
 
 class TriangulatedManifold : public IndexedMesh {

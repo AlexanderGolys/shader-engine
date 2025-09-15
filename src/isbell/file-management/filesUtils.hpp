@@ -1,7 +1,6 @@
 #pragma once
 
 #include "metaUtils.hpp"
-
 #include "exceptions.hpp"
 
 

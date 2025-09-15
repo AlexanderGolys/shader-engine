@@ -1,6 +1,6 @@
 #pragma once
 #include "unittests.hpp"
-#include "codeAnalysis.hpp"
+#include "isbell.hpp"
 
 
 inline bool projectAnalysisTest()
@@ -8,16 +8,6 @@ inline bool projectAnalysisTest()
 	try {
 		bool passed = true;
 		Path p = Path(filesystem::current_path().parent_path().parent_path().parent_path().parent_path() / "src");
-		CppProject project = CppProject(p);
-		auto files = project.listAllCppFiles({});
-		int headers = 0;
-
-		for (const auto& file : files)
-			if (file.header())
-				headers++;
-
-		LOG(format("{} total source files", files.size()));
-		LOG(format("{} header files, {} cpp files", headers, files.size() - headers));
 
 		return passed;
 	}

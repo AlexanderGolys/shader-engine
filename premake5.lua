@@ -35,11 +35,18 @@ local outdir = selectedScene .. "/build-%{cfg.architecture}"
 local inc = {
     ".",
     "src",
-    "src/utils",
-    "src/engine",
-    "src/geometry",
-    "src/physics",
-    "src/utils/file-management",
+    "src/isbell",
+    "src/isbell/utils",
+    "src/isbell/engine",
+    "src/isbell/geometry",
+    "src/isbell/physics",
+    "src/isbell/file-management",
+    "src/isbell/openglAPI",
+    "src/isbell/include",
+
+    "src/render-projects/",
+    "src/tests",
+
     "external/glew-2.1.0/include",
     "external/glfw-3.4/include",
     "external/glm-0.9.1.7",
@@ -71,21 +78,15 @@ project "engine"
     objdir    ("build/engine-build/%{cfg.architecture}/obj")
 
     files {
-        "src/**.hpp",
-        "src/**.cpp",
+        "src/isbell/**.hpp",
+        "src/isbell/**.cpp",
         "external/glew-2.1.0/src/glew.c",
         "external/glfw-3.4/src/**.c",
         "external/glm-0.9.7.1/glm/**.hpp",
 
     }
+    removefiles { "src/isbell/**_dep.**" }
 
-    removefiles {
-        project_dirs .. "/**",
-        "src/tests/**.cpp",
-        "src/tests/**.hpp",
-
-        "src/**_dep.**",
-    }
 
     includedirs(inc)
 

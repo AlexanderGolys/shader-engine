@@ -4,6 +4,7 @@
 #include "experimentalTests.hpp"
 #include "filesystemTests.hpp"
 #include "quatGLSLModuleTests.hpp"
+
 #include "../utils/logging.hpp"
 
 int main()

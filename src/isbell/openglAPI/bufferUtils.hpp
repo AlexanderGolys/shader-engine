@@ -1,7 +1,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "../utils/file-management/filesUtils.hpp"
+#include "file-management/filesUtils.hpp"
 
 namespace openglAPI {
 

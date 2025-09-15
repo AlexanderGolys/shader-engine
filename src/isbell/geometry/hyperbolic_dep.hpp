@@ -3,8 +3,8 @@
 #include "complexGeo.hpp"
 
 
-#include "../engine/specific.hpp"
-#include "../utils/func.hpp"
+#include "engine/specific.hpp"
+#include "utils/func.hpp"
 
 
 Complex planeToDisk(Complex z);

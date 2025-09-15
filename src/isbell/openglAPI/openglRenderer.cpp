@@ -14,7 +14,7 @@
 #include <string.h>
 
 #include <GL/glew.h>
-#include "src/utils/exceptions.hpp"
+#include "utils/exceptions.hpp"
 #include "openglRenderer.hpp"
 
 using namespace glm;

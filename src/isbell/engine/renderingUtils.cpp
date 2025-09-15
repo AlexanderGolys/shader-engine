@@ -18,7 +18,7 @@
 
 #include "renderingUtils.hpp"
 
-#include "src/utils/randomUtils.hpp"
+#include "utils/randomUtils.hpp"
 
 
 using namespace glm;

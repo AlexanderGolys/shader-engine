@@ -2,8 +2,8 @@
 
 #include "indexedRendering.hpp"
 #include "renderingUtils.hpp"
-#include "../utils/file-management/filesUtils.hpp"
-#include "../utils/logging.hpp"
+#include "file-management/filesUtils.hpp"
+#include "utils/logging.hpp"
 
 #include <cstdio>
 #include <cstdlib>
